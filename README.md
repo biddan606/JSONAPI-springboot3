@@ -298,6 +298,8 @@ Location: https://example.com/articles/12
   - 현재 예시에서는 복잡하여 다루고 있지 않습니다.
   - **참조:** https://jsonapi.org/ext/atomic
 
+**속성 업데이트**
+
 **요청:**
 ```http request
 PATCH /articles/12 HTTP/1.1
@@ -342,6 +344,106 @@ Content-Type: application/vnd.api+json
   }
 }
 ```
+
+**관계 업데이트**
+
+```http request
+PATCH /articles/12 HTTP/1.1
+Host: example.com
+Content-Type: application/vnd.api+json
+Accept: application/vnd.api+json
+
+{
+  "data": {
+    "type": "articles",
+    "id": "12",
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "15" }
+      },
+      "tags": {
+        "data": [
+          { "type": "tags", "id": "5" },
+          { "type": "tags", "id": "8" },
+          { "type": "tags", "id": "12" }
+        ]
+      },
+      "category": {
+        "data": { "type": "categories", "id": "4" }
+      },
+      "reviewers": {
+        "data": [
+          { "type": "people", "id": "3" },
+          { "type": "people", "id": "7" }
+        ]
+      }
+    }
+  }
+}
+```
+
+```http response
+HTTP/1.1 200 OK
+Content-Type: application/vnd.api+json
+
+{
+  "data": {
+    "type": "articles",
+    "id": "12",
+    "attributes": {
+      "title": "JSON:API와 GraphQL 심층 비교",
+      "content": "두 API 설계 방식의 장단점 분석...",
+      "created": "2025-03-22T10:30:45Z",
+      "updated": "2025-03-22T16:05:33Z"
+    },
+    "relationships": {
+      "author": {
+        "data": { "type": "people", "id": "15" },
+        "links": {
+          "self": "https://example.com/articles/12/relationships/author",
+          "related": "https://example.com/articles/12/author"
+        }
+      },
+      "tags": {
+        "data": [
+          { "type": "tags", "id": "5" },
+          { "type": "tags", "id": "8" },
+          { "type": "tags", "id": "12" }
+        ],
+        "links": {
+          "self": "https://example.com/articles/12/relationships/tags",
+          "related": "https://example.com/articles/12/tags"
+        }
+      },
+      "category": {
+        "data": { "type": "categories", "id": "4" },
+        "links": {
+          "self": "https://example.com/articles/12/relationships/category",
+          "related": "https://example.com/articles/12/category"
+        }
+      },
+      "reviewers": {
+        "data": [
+          { "type": "people", "id": "3" },
+          { "type": "people", "id": "7" }
+        ],
+        "links": {
+          "self": "https://example.com/articles/12/relationships/reviewers",
+          "related": "https://example.com/articles/12/reviewers"
+        }
+      }
+    },
+    "links": {
+      "self": "https://example.com/articles/12"
+    }
+  }
+}
+```
+
+`relationships` 객체 내의 `links`에는 두 가지 표준 링크가 포함됩니다:   
+- `self 링크 ("self": "https://example.com/articles/12/relationships/author")`: 이 링크는 관계 자체를 조작하기 위한 엔드포인트를 가리킵니다.
+- `related 링크 ("related": "https://example.com/articles/12/author")`: 이 링크는 관련 리소스 자체에 접근하기 위한 엔드포인트입니다.
+
 
 ## 주요 구조 요소
 
