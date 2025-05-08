@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres
+    container_name: jsonapi-postgres
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: jsonapidb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: jsonapi-adminer
+    restart: always
+    ports:
+      - "8888:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
