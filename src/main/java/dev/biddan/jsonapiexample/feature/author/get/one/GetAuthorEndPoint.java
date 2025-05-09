@@ -3,10 +3,9 @@ package dev.biddan.jsonapiexample.feature.author.get.one;
 import static com.toedter.spring.hateoas.jsonapi.MediaTypes.JSON_API_VALUE;
 
 import dev.biddan.jsonapiexample.domain.author.Author;
-import dev.biddan.jsonapiexample.feature.author.AuthorJsonModelAssembler;
+import dev.biddan.jsonapiexample.jsonapi.author.AuthorJsonModelAssembler;
 import dev.biddan.jsonapiexample.persistence.AuthorRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

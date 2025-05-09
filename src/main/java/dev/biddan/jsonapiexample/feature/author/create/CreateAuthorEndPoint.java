@@ -2,12 +2,9 @@ package dev.biddan.jsonapiexample.feature.author.create;
 
 import static com.toedter.spring.hateoas.jsonapi.MediaTypes.JSON_API_VALUE;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.toedter.spring.hateoas.jsonapi.JsonApiId;
-import com.toedter.spring.hateoas.jsonapi.JsonApiType;
-import com.toedter.spring.hateoas.jsonapi.JsonApiTypeForClass;
 import dev.biddan.jsonapiexample.domain.author.Author;
-import dev.biddan.jsonapiexample.feature.author.AuthorJsonModelAssembler;
+import dev.biddan.jsonapiexample.jsonapi.author.AuthorJsonModelAssembler;
 import dev.biddan.jsonapiexample.feature.author.create.CreateAuthorHandler.CreateAuthorCommand;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -15,8 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
 import java.util.Objects;
 import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
