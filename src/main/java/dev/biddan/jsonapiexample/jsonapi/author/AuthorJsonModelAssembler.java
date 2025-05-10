@@ -1,4 +1,4 @@
-package dev.biddan.jsonapiexample.feature.author;
+package dev.biddan.jsonapiexample.jsonapi.author;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;

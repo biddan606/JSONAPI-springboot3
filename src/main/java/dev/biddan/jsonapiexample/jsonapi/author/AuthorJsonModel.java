@@ -1,4 +1,4 @@
-package dev.biddan.jsonapiexample.feature.author;
+package dev.biddan.jsonapiexample.jsonapi.author;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.toedter.spring.hateoas.jsonapi.JsonApiId;
@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
@@ -16,7 +15,7 @@ import org.springframework.hateoas.RepresentationModel;
 @NoArgsConstructor
 @JsonApiTypeForClass("authors")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthorJsonModel extends RepresentationModel<AuthorJsonModel> {
+public class AuthorJsonModel {
 
     @JsonApiId
     private String id;
