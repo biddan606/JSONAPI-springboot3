@@ -25,8 +25,8 @@ public class GetArticleEndPoint {
     @GetMapping(path = "/articles/{id}", produces = JSON_API_VALUE)
     public ResponseEntity<RepresentationModel<?>> getArticle(
             @PathVariable String id,
-            @RequestParam(value = "include", required = false) String include,
-            @RequestParam(value = "fields[articles]", required = false) String articleFields) {
+            @RequestParam(value = "include", required = false) String[] include,
+            @RequestParam(value = "fields[articles]", required = false) String[] articleFields) {
 
         Article article = articleRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Article not found"));

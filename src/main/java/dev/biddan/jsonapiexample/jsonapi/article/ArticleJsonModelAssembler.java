@@ -7,13 +7,8 @@ import com.toedter.spring.hateoas.jsonapi.JsonApiId;
 import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
 import com.toedter.spring.hateoas.jsonapi.JsonApiTypeForClass;
 import dev.biddan.jsonapiexample.domain.article.Article;
-import dev.biddan.jsonapiexample.domain.tag.Tag;
 import dev.biddan.jsonapiexample.feature.article.get.GetArticleEndPoint;
-import dev.biddan.jsonapiexample.jsonapi.author.AuthorJsonModelAssembler;
-import dev.biddan.jsonapiexample.jsonapi.category.CategoryJsonModelAssembler;
-import dev.biddan.jsonapiexample.jsonapi.tag.TagJsonModelAssembler;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,31 +20,21 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ArticleJsonModelAssembler {
 
-    private final AuthorJsonModelAssembler authorJsonModelAssembler;
-    private final CategoryJsonModelAssembler categoryJsonModelAssembler;
-    private final TagJsonModelAssembler tagJsonModelAssembler;
-
     public RepresentationModel<?> toJsonApiModel(Article article) {
         return toJsonApiModel(article, null, null);
     }
 
     public RepresentationModel<?> toJsonApiModel(
             Article article,
-            String include,
-            String articleFields) {
-
-        Set<String> articleFieldsSet = parseFields(articleFields);
+            String[] include,
+            String[] articleFields) {
 
         ArticleJsonModel articleModel = ArticleJsonModel.builder()
                 .id(article.getId().toString())
-                .title(articleFieldsSet.isEmpty() || articleFieldsSet.contains("title") ? article.getTitle() : null)
-                .content(articleFieldsSet.isEmpty() || articleFieldsSet.contains("content") ? article.getContent()
-                        : null)
-                .created(articleFieldsSet.isEmpty() || articleFieldsSet.contains("created") ? article.getCreated()
-                        : null)
-                .updated(articleFieldsSet.isEmpty() || articleFieldsSet.contains("updated") ? article.getUpdated()
-                        : null)
-                .build();
+                .title(article.getTitle())
+                .content(article.getContent())
+                .created(article.getCreated())
+                .updated(article.getUpdated()).build();
 
         Link selfLink = linkTo(
                 methodOn(GetArticleEndPoint.class).getArticle(articleModel.getId(), include, articleFields))
@@ -59,64 +44,35 @@ public class ArticleJsonModelAssembler {
                 .model(articleModel)
                 .link(selfLink);
 
+        if (articleFields != null && articleFields.length > 0) {
+            modelBuilder.fields("articles", articleFields);
+        }
+
         // 관계 처리
-        if (article.getAuthor() != null) {
-            // JsonApiTypeForClass를 이용하여 다른 클래스명으로 추가 가능
-            AuthorResourceIdentifier authorResourceIdentifier = new AuthorResourceIdentifier(
-                    article.getAuthor().getId());
+        if (include != null && include.length > 0) {
+            Set<String> includeSet = Arrays.stream(include).collect(Collectors.toSet());
+            if (article.getAuthor() != null
+                    && (includeSet.isEmpty() || !includeSet.contains("author"))) {
+                // JsonApiTypeForClass를 이용하여 다른 클래스명으로 추가 가능
+                AuthorResourceIdentifier authorResourceIdentifier = new AuthorResourceIdentifier(
+                        article.getAuthor().getId());
 
-            modelBuilder.relationship("author", authorResourceIdentifier);
-        }
-
-        if (article.getCategory() != null) {
-            modelBuilder.relationship("category", article.getCategory());
-        }
-
-        // many to many
-        if (article.getTags() != null && !article.getTags().isEmpty()) {
-            modelBuilder.relationship("tags", article.getTags());
-        }
-
-        if (include != null && !include.trim().isEmpty()) {
-            Set<String> includedResources = parseInclude(include);
-
-            // Author 포함
-            if (includedResources.contains("author") && article.getAuthor() != null) {
-                modelBuilder.included(authorJsonModelAssembler.toJsonApiModel(article.getAuthor()));
+                modelBuilder.relationship("author", authorResourceIdentifier);
             }
 
-            // Category 포함
-            if (includedResources.contains("category") && article.getCategory() != null) {
-                modelBuilder.included(categoryJsonModelAssembler.toJsonApiModel(article.getCategory()));
+            if (article.getCategory() != null
+                    && (includeSet.isEmpty() || !includeSet.contains("category"))) {
+                modelBuilder.relationship("category", article.getCategory());
             }
 
-            // Tags 포함
-            if (includedResources.contains("tags") && article.getTags() != null && !article.getTags().isEmpty()) {
-                for (Tag tag : article.getTags()) {
-                    modelBuilder.included(tagJsonModelAssembler.toJsonApiModel(tag));
-                }
+            // many to many
+            if (!article.getTags().isEmpty()
+                    && (includeSet.isEmpty() || !includeSet.contains("tags"))) {
+                modelBuilder.relationship("tags", article.getTags());
             }
         }
 
         return modelBuilder.build();
-    }
-
-    private Set<String> parseFields(String fields) {
-        if (fields == null || fields.trim().isEmpty()) {
-            return new HashSet<>();
-        }
-        return Arrays.stream(fields.split(","))
-                .map(String::trim)
-                .collect(Collectors.toSet());
-    }
-
-    private Set<String> parseInclude(String include) {
-        if (include == null || include.trim().isEmpty()) {
-            return new HashSet<>();
-        }
-        return Arrays.stream(include.split(","))
-                .map(String::trim)
-                .collect(Collectors.toSet());
     }
 
     @JsonApiTypeForClass("authors")
