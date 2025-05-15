@@ -3,15 +3,21 @@ package dev.biddan.jsonapiexample.feature.article.create;
 import static com.toedter.spring.hateoas.jsonapi.MediaTypes.JSON_API_VALUE;
 
 import com.toedter.spring.hateoas.jsonapi.JsonApiId;
+import com.toedter.spring.hateoas.jsonapi.JsonApiModelBuilder;
 import com.toedter.spring.hateoas.jsonapi.JsonApiRelationships;
 import dev.biddan.jsonapiexample.domain.article.Article;
+import dev.biddan.jsonapiexample.domain.author.Author;
+import dev.biddan.jsonapiexample.domain.category.Category;
 import dev.biddan.jsonapiexample.feature.article.create.CreateArticleHandler.CreateArticleCommand;
 import dev.biddan.jsonapiexample.jsonapi.article.ArticleJsonModelAssembler;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,7 +79,7 @@ public class CreateArticleEndPoint {
                 .toUri();
 
         // Create the response model
-        RepresentationModel<?> articleModel = articleJsonModelAssembler.toJsonApiModel(createdArticle);
+        RepresentationModel<?> articleModel = articleJsonModelAssembler.toJsonApiModel(createdArticle, null);
 
         // Return the response
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -123,5 +129,4 @@ public class CreateArticleEndPoint {
         String id;
         String type;
     }
-
 }

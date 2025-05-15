@@ -55,7 +55,7 @@ public class FindArticlesEndPoint {
 
         // 2. PagedModel 생성 - 기본 데이터 구조
         List<RepresentationModel<?>> articleModels = articlesPage.getContent().stream()
-                .map(article -> articleJsonModelAssembler.toJsonApiModel(article, includeArr, articleFields))
+                .map(article -> articleJsonModelAssembler.toJsonApiModel(article, articleFields))
                 .collect(Collectors.toList());
 
         PagedModel.PageMetadata metadata = new PagedModel.PageMetadata(

@@ -27,7 +27,4 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             "LEFT JOIN FETCH a.category",
             countQuery = "SELECT COUNT(a) FROM Article a")
     Page<Article> findAllWithCommonRelations(Pageable pageable);
-
-    @Query("SELECT t FROM Article a JOIN a.tags t WHERE a.id = :articleId")
-    Set<Tag> findTagsByArticleId(@Param("articleId") Long articleId);
 }

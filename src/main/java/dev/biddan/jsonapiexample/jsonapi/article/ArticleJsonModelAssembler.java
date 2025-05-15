@@ -9,6 +9,7 @@ import com.toedter.spring.hateoas.jsonapi.JsonApiTypeForClass;
 import dev.biddan.jsonapiexample.domain.article.Article;
 import dev.biddan.jsonapiexample.feature.article.get.GetArticleEndPoint;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,11 @@ import org.springframework.stereotype.Component;
 public class ArticleJsonModelAssembler {
 
     public RepresentationModel<?> toJsonApiModel(Article article) {
-        return toJsonApiModel(article, null, null);
+        return toJsonApiModel(article, null);
     }
 
     public RepresentationModel<?> toJsonApiModel(
             Article article,
-            String[] include,
             String[] articleFields) {
 
         ArticleJsonModel articleModel = ArticleJsonModel.builder()
@@ -37,7 +37,7 @@ public class ArticleJsonModelAssembler {
                 .updated(article.getUpdated()).build();
 
         Link selfLink = linkTo(
-                methodOn(GetArticleEndPoint.class).getArticle(articleModel.getId(), include, articleFields))
+                methodOn(GetArticleEndPoint.class).getArticle(articleModel.getId(), null, null))
                 .withSelfRel();
 
         JsonApiModelBuilder modelBuilder = JsonApiModelBuilder.jsonApiModel()
@@ -48,28 +48,23 @@ public class ArticleJsonModelAssembler {
             modelBuilder.fields("articles", articleFields);
         }
 
-        // 관계 처리
-        if (include != null && include.length > 0) {
-            Set<String> includeSet = Arrays.stream(include).collect(Collectors.toSet());
-            if (article.getAuthor() != null
-                    && (includeSet.isEmpty() || !includeSet.contains("author"))) {
-                // JsonApiTypeForClass를 이용하여 다른 클래스명으로 추가 가능
-                AuthorResourceIdentifier authorResourceIdentifier = new AuthorResourceIdentifier(
-                        article.getAuthor().getId());
+        Set<String> articleFieldSet = Collections.emptySet();
+        if (articleFields != null) {
+            articleFieldSet = Arrays.stream(articleFields).collect(Collectors.toSet());
+        }
 
-                modelBuilder.relationship("author", authorResourceIdentifier);
-            }
+        if (article.getAuthor() != null && (articleFieldSet.isEmpty() || articleFieldSet.contains("author"))) {
+            // JsonApiTypeForClass를 이용하여 다른 클래스명으로 추가 가능
+            AuthorResourceIdentifier authorResourceIdentifier = new AuthorResourceIdentifier(
+                    article.getAuthor().getId());
 
-            if (article.getCategory() != null
-                    && (includeSet.isEmpty() || !includeSet.contains("category"))) {
-                modelBuilder.relationship("category", article.getCategory());
-            }
-
-            // many to many
-            if (!article.getTags().isEmpty()
-                    && (includeSet.isEmpty() || !includeSet.contains("tags"))) {
-                modelBuilder.relationship("tags", article.getTags());
-            }
+            modelBuilder.relationship("author", authorResourceIdentifier);
+        }
+        if (articleFieldSet.isEmpty() || articleFieldSet.contains("category")) {
+            modelBuilder.relationship("category", article.getCategory());
+        }
+        if (articleFieldSet.isEmpty() || articleFieldSet.contains("tags")) {
+            modelBuilder.relationship("tags", article.getTags());
         }
 
         return modelBuilder.build();
