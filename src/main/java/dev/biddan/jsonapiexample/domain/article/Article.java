@@ -55,22 +55,13 @@ public class Article {
     )
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "article_reviewer",
-            joinColumns = @JoinColumn(name = "article_id"),
-            inverseJoinColumns = @JoinColumn(name = "reviewer_id")
-    )
-    private Set<Author> reviewers = new HashSet<>();
-
     @Builder
-    public Article(String title, String content, Author author, Category category, Set<Tag> tags, Set<Author> reviewers) {
+    public Article(String title, String content, Author author, Category category, Set<Tag> tags) {
         this.title = title;
         this.content = content;
         this.author = author;
         this.category = category;
         this.tags = tags;
-        this.reviewers = reviewers;
     }
 
     @PrePersist
